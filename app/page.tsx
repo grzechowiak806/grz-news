@@ -20,6 +20,14 @@ export default function Home() {
             <a href="#subscribe" className="hover:text-zinc-300">
               Subscribe
             </a>
+
+<a
+  href="/games"
+  className="font-bold text-orange-400 hover:text-orange-300"
+>
+  🎮 GRZ Arcade
+</a>
+
           </nav>
         </div>
       </header>

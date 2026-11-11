@@ -70,7 +70,7 @@ export default function GamesPage() {
 					</p>
 
 					<Link
-						href="/games/dusty-torque"
+						href="/games/dusty-torque/index.html"
 						style={{
 							display: "inline-block",
 							background: "#ea580c",
