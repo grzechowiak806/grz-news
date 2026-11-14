@@ -13,6 +13,13 @@ type Report = {
   details: string;
   status: string;
   created_at: string;
+
+chat_messages: {
+  user_id: string;
+  display_name: string;
+} | null;
+
+
 };
 
 export default function ModeratorDashboard() {
@@ -27,9 +34,21 @@ export default function ModeratorDashboard() {
   async function loadReports() {
     const { data, error } = await supabase
       .from("chat_reports")
-      .select(
-        "id,message_id,reporter_id,reason,details,status,created_at"
-      )
+
+.select(`
+  id,
+  message_id,
+  reporter_id,
+  reason,
+  details,
+  status,
+  created_at,
+  chat_messages (
+    user_id,
+    display_name
+  )
+`)
+
       .order("created_at", { ascending: false })
       .limit(100);
 
@@ -38,7 +57,18 @@ export default function ModeratorDashboard() {
       return;
     }
 
-    setReports(data ?? []);
+console.log("MODERATOR REPORT DATA:", data);
+
+ 
+setReports(
+  (data ?? []).map((report) => ({
+    ...report,
+    chat_messages: Array.isArray(report.chat_messages)
+      ? report.chat_messages[0] ?? null
+      : report.chat_messages ?? null,
+  }))
+);
+
   }
 
   async function checkModerator() {
@@ -314,6 +344,10 @@ export default function ModeratorDashboard() {
                       </p>
                       <p>Message ID: {report.message_id}</p>
                       <p>Reason: {report.reason}</p>
+<p>
+  Message author:{" "}
+  {report.chat_messages?.display_name ?? "Unknown"}
+</p>
 
 <div className="mt-3 flex flex-wrap gap-2">
   <button
@@ -333,6 +367,21 @@ export default function ModeratorDashboard() {
   >
     🗑 Remove Message
   </button>
+
+<button
+  type="button"
+disabled={busy || !report.chat_messages?.user_id}
+    onClick={() => {
+const authorId = report.chat_messages?.user_id;
+    if (authorId) {
+      void blockUser(authorId);
+    }
+  }}
+  className="rounded-lg bg-orange-700 px-3 py-2 text-sm font-bold hover:bg-orange-600 disabled:opacity-40"
+>
+  🚫 Block User
+</button>
+
 </div>
 
                       <p>Status: {report.status}</p>
