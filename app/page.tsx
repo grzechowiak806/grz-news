@@ -29,6 +29,12 @@ export default function Home() {
 </a>
 
           </nav>
+          <a
+  href="/america-for-president"
+  className="font-bold text-orange-400 hover:text-orange-300"
+>
+  🇺🇸 America for President
+</a>
         </div>
       </header>
 
