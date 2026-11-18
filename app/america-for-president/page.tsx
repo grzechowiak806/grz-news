@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../../lib/supabase";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 type ChatMessage = {
   id: number;
@@ -23,6 +24,7 @@ export default function AmericaForPresident() {
   const [errorMessage, setErrorMessage] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
+const [captchaToken, setCaptchaToken] = useState("");
   useEffect(() => {
     let active = true;
 
@@ -39,21 +41,32 @@ export default function AmericaForPresident() {
 
       let session = sessionData.session;
 
-      if (!session) {
-        const { data, error } =
-          await supabase.auth.signInAnonymously();
 
-        if (!active) return;
+if (!session) {
+  if (!captchaToken) {
+    setStatus("Complete the security check to join the chat.");
+    return;
+  }
 
-        if (error || !data.session) {
-          setStatus(
-            "Sign-in failed: " +
-              (error?.message ?? "No session returned")
-          );
-          return;
-        }
+  const { data, error } = await supabase.auth.signInAnonymously({
+    options: {
+      captchaToken,
+    },
+  });
+
+  if (!active) return;
+
+  if (error || !data.session) {
+    setStatus(
+      "Sign-in failed: " +
+        (error?.message ?? "No session returned") +
+        ". Refresh the page to try again."
+    );
+    return;
+  }
 
         session = data.session;
+
       }
 
       setUserId(session.user.id);
