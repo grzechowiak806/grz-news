@@ -347,7 +347,23 @@ const refreshTimer = setInterval(() => {
 
             <div ref={bottomRef} />
           </div>
+<div className="mb-5">
+  {!userId && (
+    <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
+      <p className="mb-3 text-sm text-slate-300">
+        🔒 Complete this security check to join the chat.
+      </p>
 
+      <Turnstile
+        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
+        options={{ theme: "dark" }}
+        onSuccess={(token) => setCaptchaToken(token)}
+        onExpire={() => setCaptchaToken("")}
+        onError={() => setCaptchaToken("")}
+      />
+    </div>
+  )}
+</div>
           <form onSubmit={sendMessage} className="space-y-3">
             <input
               value={displayName}
